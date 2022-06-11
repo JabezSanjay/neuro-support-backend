@@ -43,3 +43,12 @@ exports.adminDeleteCourse = BigPromise(async (req, res, next) => {
     message: 'Course deleted successfully',
   });
 });
+
+exports.readCourses = BigPromise(async (req, res, next) => {
+  const courses = await Course.find();
+  res.status(200).json({
+    success: true,
+    data: courses,
+    message: 'Courses fetched successfully',
+  });
+});

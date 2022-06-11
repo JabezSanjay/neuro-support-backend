@@ -4,6 +4,7 @@ const BigPromise = require('../middleware/bigPromise');
 const cookieToken = require('../utils/cookieToken');
 const CustomError = require('../utils/customError');
 const validator = require('validator');
+const { uuid } = require('uuidv4');
 
 exports.signup = BigPromise(async (req, res, next) => {
   let newUser;
@@ -21,10 +22,12 @@ exports.signup = BigPromise(async (req, res, next) => {
   if (user) {
     return next(new CustomError('User already exists', 400, res));
   }
+
   newUser = await User.create({
     name,
     email,
     password,
+    socketId: uuid().toString(),
   });
   cookieToken(newUser, res);
 });
@@ -92,6 +95,7 @@ exports.adminCreateUser = BigPromise(async (req, res, next) => {
     email,
     password,
     role,
+    socketId: uuid().toString(),
   });
   res.status(201).json({
     success: true,

@@ -20,7 +20,7 @@ exports.mentorReadTickets = BigPromise(async (req, res, next) => {
   });
 });
 
-exports.mentorCreateTickets = BigPromise(async (req, res, next) => {
+exports.mentorCreateTicket = BigPromise(async (req, res, next) => {
   const { content, createdBy, createdFor, course } = req.body;
   if (!title || !description || !course) {
     return next(
@@ -63,7 +63,7 @@ exports.mentorChangeStatusTicket = BigPromise(async (req, res, next) => {
 });
 
 exports.mentorDeleteTicket = BigPromise(async (req, res, next) => {
-  const { id } = req.body;
+  const { id } = req.params;
   if (!id) {
     return next(new CustomError('Id is required!', 400, res));
   }

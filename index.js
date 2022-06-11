@@ -43,6 +43,7 @@ io.on('connection', async (socket) => {
   socket.on('private-message', async ({ connectedUserId, content }) => {
     console.log(connectedUserId, content)
     console.log(socket.uid, 'my id')
+    console.log(socket.uid, 'my id')
 
     Msg.create({
       content: content,

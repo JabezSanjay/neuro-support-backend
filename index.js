@@ -20,28 +20,14 @@ io.use(async (socket, next) => {
     return next(new Error('invalid username'))
   }
   socket.uid = uid
-  console.log(uid)
-  //   let user = await User.findOneAndUpdate({ socketId: uid }, { isOnline: true })
-  // user.isOnline = true
+  console.log(uid, 'socket connectedx')
 
   next()
 })
-io.on('connection', async (socket) => {
-  console.log(socket.uid, 'socket connected')
 
+io.on('connection', async (socket) => {
   socket.join(socket.uid)
 
-  //   socket.on('connect-student-mentor', async ({ studentId, mentorId }) => {
-  //     //update mentorId to student
-  //     await User.updateOne({ _id: studentId }, { $push: { mentorId: mentorId } })
-  //     //update studentId to mentor
-  //     await User.updateOne({ _id: mentorId }, { $push: { studentId: studentId } })
-  //   })
-  //   socket.on('disconnect-student-mentor', async ({ studentId, mentorId }) => {
-  //     //update mentorId to student
-  //     await User.updateOne({ _id: studentId }, { $push: { mentorId: mentorId } })
-  //     await User.updateOne({ _id: studentId }, { $push: { mentorId: mentorId } })
-  //   })
   socket.on('retrieve-messages', async ({ connectedUserId }) => {
     const messages = await Msg.find({
       commonId: {
@@ -51,15 +37,18 @@ io.on('connection', async (socket) => {
         ],
       },
     })
-
+    console.log(socket.uid, connectedUserId, 'my selected id')
     io.to(socket.uid).to(connectedUserId).emit('private message', messages)
   })
   socket.on('private-message', async ({ connectedUserId, content }) => {
-    const message = await Msg.create({
+    console.log(connectedUserId, content)
+    console.log(socket.uid, 'my id')
+
+    Msg.create({
       content: content,
-      sender: senderId,
-      reciever: recieverId,
-      commonId: `${senderId}${recieverId}`,
+      sender: socket.uid,
+      reciever: connectedUserId,
+      commonId: `${socket.uid}${connectedUserId}`,
     })
 
     const messages = await Msg.find({
@@ -70,6 +59,7 @@ io.on('connection', async (socket) => {
         ],
       },
     })
+    console.log(socket.uid, 'emitted id')
     io.to(socket.uid).to(connectedUserId).emit('private message', messages)
   })
 })

@@ -4,10 +4,12 @@ const BigPromise = require('../middleware/bigPromise');
 const cookieToken = require('../utils/cookieToken');
 const CustomError = require('../utils/customError');
 const validator = require('validator');
+const { uuid } = require('uuidv4');
 
 exports.signup = BigPromise(async (req, res, next) => {
   let newUser;
-  const { name, email, password } = req.body;
+  let socketId = uuid();
+  const { name, email, password, course } = req.body;
   if (!name) {
     return next(new CustomError('Name is required!', 400, res));
   }
@@ -25,7 +27,26 @@ exports.signup = BigPromise(async (req, res, next) => {
     name,
     email,
     password,
+    course,
+    socketId,
   });
+
+  const mentors = await User.find({
+    role: 'mentor',
+    course: { $in: course },
+  });
+
+  const mentor = mentors[Math.floor(Math.random() * mentors.length)];
+
+  newUser.mentorsId.push(mentor.socketId);
+  await newUser.save();
+
+  const oneMentor = await User.findOne({
+    socketId: mentor.socketId,
+  });
+  oneMentor.studentsId.push(newUser.socketId);
+  await oneMentor.save();
+
   cookieToken(newUser, res);
 });
 
@@ -70,7 +91,8 @@ exports.getLoggedInUserInfo = BigPromise(async (req, res, next) => {
 
 //Admin APIs
 exports.adminCreateUser = BigPromise(async (req, res, next) => {
-  const { name, email, password, role } = req.body;
+  let socketId = uuid();
+  const { name, email, password, role, course } = req.body;
   if (!name) {
     return next(new CustomError('Name is required!', 400, res));
   }
@@ -92,7 +114,28 @@ exports.adminCreateUser = BigPromise(async (req, res, next) => {
     email,
     password,
     role,
+    course,
+    socketId,
   });
+
+  if (role === 'student') {
+    const mentors = await User.find({
+      role: 'mentor',
+      course: { $in: course },
+    });
+
+    const mentor = mentors[Math.floor(Math.random() * mentors.length)];
+
+    newUser.mentorsId.push(mentor.socketId);
+    await newUser.save();
+
+    const oneMentor = await User.findOne({
+      socketId: mentor.socketId,
+    });
+    oneMentor.studentsId.push(newUser.socketId);
+    await oneMentor.save();
+  }
+
   res.status(201).json({
     success: true,
     data: newUser,

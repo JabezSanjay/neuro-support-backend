@@ -1,15 +1,5 @@
 const express = require('express');
-const {
-  signup,
-  signin,
-  logout,
-  getLoggedInUserInfo,
-  adminCreateUser,
-  getAllUsers,
-  adminDeleteOneUser,
-  adminAddMentorToUsers,
-  adminReadUsers,
-} = require('../controller/User');
+const {} = require('../controller/Course');
 const { isLoggedIn, customRole } = require('../middleware/user');
 const router = express.Router();
 const cookieToken = require('../utils/cookieToken');

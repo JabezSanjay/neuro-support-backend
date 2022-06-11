@@ -9,6 +9,7 @@ const {
   adminDeleteOneUser,
   adminAddMentorToUsers,
   adminReadUsers,
+  getConnectedUsers,
 } = require('../controller/User');
 const { isLoggedIn, customRole } = require('../middleware/user');
 const router = express.Router();
@@ -30,7 +31,10 @@ router
   .route('/admin/delete/user/:id')
   .delete(isLoggedIn, customRole('admin'), adminDeleteOneUser);
 router
-  .route('/admin/add/mentors/:id')
+  .route('/admin/add/mentors')
   .put(isLoggedIn, customRole('admin'), adminAddMentorToUsers);
+
+//mentor routes
+router.route('/connected/users').get(isLoggedIn, getConnectedUsers);
 
 module.exports = router;

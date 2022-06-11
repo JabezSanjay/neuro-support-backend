@@ -122,12 +122,12 @@ exports.adminDeleteOneUser = BigPromise(async (req, res, next) => {
 });
 
 exports.adminAddMentorToUsers = BigPromise(async (req, res, next) => {
-  const { mentorId } = req.body;
+  const { mentorId, studentId } = req.body;
   if (!mentorId) {
     return next(new CustomError('Mentor is required!', 400, res));
   }
-  const user = await User.find({
-    socketId: req.params.id,
+  const user = await User.findOne({
+    socketId: studentId,
   });
   if (!user) {
     return next(new CustomError('User does not exists!', 404, res));
@@ -135,13 +135,13 @@ exports.adminAddMentorToUsers = BigPromise(async (req, res, next) => {
   user.mentorsId.push(mentorId);
   await user.save();
   //add users to mentor id
-  const mentor = await User.find({
+  const mentor = await User.findOne({
     socketId: mentorId,
   });
   if (!mentor) {
     return next(new CustomError('Mentor does not exists!', 404, res));
   }
-  mentor.studentsId.push(user._id);
+  mentor.studentsId.push(studentId);
   await mentor.save();
 
   if (!user) {
@@ -151,5 +151,29 @@ exports.adminAddMentorToUsers = BigPromise(async (req, res, next) => {
     success: true,
     data: user,
     message: 'Mentor added successfully!',
+  });
+});
+
+exports.getConnectedUsers = BigPromise(async (req, res, next) => {
+  const currentUser = await User.findById(req.user._id);
+  let connectedUsers;
+
+  if (req.user.role === 'mentor') {
+    connectedUsers = await User.find({
+      socketId: {
+        $in: currentUser.studentsId,
+      },
+    });
+  } else {
+    connectedUsers = await User.find({
+      socketId: {
+        $in: currentUser.mentorsId,
+      },
+    });
+  }
+  res.json({
+    success: true,
+    data: connectedUsers,
+    message: 'Connected users fetched successfully!',
   });
 });

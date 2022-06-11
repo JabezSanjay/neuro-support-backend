@@ -26,5 +26,7 @@ app.use(morgan('tiny'));
 
 //Import all other routes
 app.use('/api', require('./routes/User'));
+app.use('/api', require('./routes/Ticket'));
+app.use('/api', require('./routes/Course'));
 
 module.exports = app;

@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "Real time chat support where students can discuss their doubts with mentors",
   "main": "index.js",
+  "engines": {
+    "node": "14.x"
+  },
   "scripts": {
     "start": "node index.js",
     "develop": "nodemon index.js"

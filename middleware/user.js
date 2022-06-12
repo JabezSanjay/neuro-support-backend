@@ -11,6 +11,7 @@ exports.isLoggedIn = BigPromise(async (req, res, next) => {
       ? (token = undefined)
       : (token = req.header('Authorization').replace('Bearer ', ''));
   }
+  console.log(token);
   if (!token) {
     return next(new CustomError('Login to get access!', 401, res));
   }

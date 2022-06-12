@@ -5,18 +5,9 @@ const ticketSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please add a content'],
   },
-  createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-  },
-  course: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Course',
-  },
-  createdFor: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-  },
+  createdBy: String,
+  course: String,
+  createdFor: String,
   createdAt: {
     type: Date,
     default: Date.now,
@@ -24,7 +15,9 @@ const ticketSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: ['pending', 'in-progress', 'completed'],
+    default: 'pending',
   },
+  mentor: String,
 });
 
 module.exports = mongoose.model('Ticket', ticketSchema);
